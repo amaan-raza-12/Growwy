@@ -278,7 +278,8 @@ const HeroSection: React.FC<{ onNavigate: (id: string) => void }> = ({ onNavigat
                     </button>
                 </div>
             </div>
-            <style jsx>{`
+            {/* Fix: Removed the 'jsx' attribute from the <style> tag. The 'jsx' attribute is a feature of styled-jsx (used in Next.js) and is not supported in a standard React setup. */}
+            <style>{`
                 @keyframes blob {
                     0% { transform: translate(0px, 0px) scale(1); }
                     33% { transform: translate(30px, -50px) scale(1.1); }
@@ -392,10 +393,42 @@ const AboutSection = () => {
 };
 
 const ContactSection = () => {
+    const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        alert("Thank you for your interest! We will get back to you shortly.");
+        const form = e.target as HTMLFormElement;
+        const data = new FormData(form);
+        setFormStatus('submitting');
+        
+        // This is a common pattern for submitting to a Google Sheet via an intermediary service
+        // like a Google Apps Script Web App. You need to replace the URL below.
+        // For this to work, you must:
+        // 1. Create a Google Sheet.
+        // 2. Create a Google Apps Script (Extensions > Apps Script).
+        // 3. Paste a script that handles POST requests and writes to your sheet.
+        // 4. Deploy the script as a Web App, granting access to "Anyone".
+        // 5. Copy the Web App URL and paste it here.
+        const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE'; 
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: data,
+        })
+        .then(response => {
+             // Since many script hosts use redirects and CORS can be tricky,
+             // we'll optimistically assume success if we get any OK response.
+             if (response.ok || response.type === 'opaque') {
+                setFormStatus('success');
+                form.reset();
+             } else {
+                setFormStatus('error');
+             }
+        })
+        .catch(() => setFormStatus('error'));
     };
+
+    const isSubmitting = formStatus === 'submitting';
 
     return (
         <Section id="contact">
@@ -403,23 +436,42 @@ const ContactSection = () => {
                 <h2 className="text-4xl md:text-5xl font-bold text-center mb-4">Let’s Grow Your <span className="text-gradient">Bookings.</span></h2>
                 <p className="text-center text-gray-400 max-w-xl mx-auto mb-12">Fill out the form below for a free, no-obligation consultation call.</p>
                 <form onSubmit={handleSubmit} className="max-w-xl mx-auto space-y-6">
-                    <input type="text" placeholder="Your Name" required className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all"/>
-                    <input type="text" placeholder="Your Business Name" required className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all"/>
-                    <input type="tel" placeholder="Phone Number" required className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all"/>
-                    <select required className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all">
-                        <option value="" disabled selected>Select Service Type</option>
+                    <input type="text" name="Name" placeholder="Your Name" required disabled={isSubmitting} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all disabled:opacity-50"/>
+                    <input type="text" name="BusinessName" placeholder="Your Business Name" required disabled={isSubmitting} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all disabled:opacity-50"/>
+                    <input type="tel" name="PhoneNumber" placeholder="Phone Number" required disabled={isSubmitting} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all disabled:opacity-50"/>
+                    <select name="ServiceType" required defaultValue="" disabled={isSubmitting} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all disabled:opacity-50">
+                        <option value="" disabled>Select Service Type</option>
                         <option value="marriage-hall">Marriage Hall</option>
                         <option value="event-hotel">Event Hotel</option>
                         <option value="school">School / Coaching</option>
                         <option value="other">Other</option>
                     </select>
-                    <button type="submit" className="w-full bg-[#0056CB] text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-opacity-80 transition-all duration-300 transform hover:scale-105 glow-effect">
-                        Request Consultation
+                    <button type="submit" disabled={isSubmitting} className="w-full bg-[#0056CB] text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-opacity-80 transition-all duration-300 transform hover:scale-105 glow-effect disabled:opacity-50 disabled:cursor-not-allowed">
+                        {isSubmitting ? 'Submitting...' : 'Request Consultation'}
                     </button>
                 </form>
-                <div className="flex justify-center items-center space-x-8 mt-12">
-                    <a href="#" className="text-green-400 hover:text-green-300 transition-all transform hover:scale-110"><WhatsAppIcon/></a>
-                    <a href="#" className="text-blue-400 hover:text-blue-300 transition-all transform hover:scale-110"><PhoneCallIcon/></a>
+
+                {formStatus === 'success' && (
+                    <p className="text-center text-green-400 mt-6 animate-pulse">
+                        Thank you! We've received your request and will contact you shortly.
+                    </p>
+                )}
+                {formStatus === 'error' && (
+                     <p className="text-center text-red-400 mt-6">
+                        Oops! Something went wrong. Please try again or contact us directly below.
+                    </p>
+                )}
+
+                <div className="text-center mt-12">
+                    <p className="text-gray-500 mb-4">Or contact us directly</p>
+                    <div className="flex justify-center items-center space-x-8">
+                        <a href="https://wa.me/917250407696" target="_blank" rel="noopener noreferrer" className="text-green-400 hover:text-green-300 transition-all transform hover:scale-110" aria-label="Chat on WhatsApp">
+                            <WhatsAppIcon/>
+                        </a>
+                        <a href="tel:+917250407696" className="text-blue-400 hover:text-blue-300 transition-all transform hover:scale-110" aria-label="Call us">
+                            <PhoneCallIcon/>
+                        </a>
+                    </div>
                 </div>
             </div>
         </Section>
