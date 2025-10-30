@@ -400,7 +400,7 @@ const ContactSection = () => {
         e.preventDefault();
         setStatus('submitting');
         const form = e.currentTarget;
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbwP5uM7UyXHTq9kcMA9NHGqif2NN4JoZXnOZRq_XGS7GHXAMI7Y2w1aFGavR-JX9yUL-A/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxRH4lAQ2YnVO9DDDlYpCFVVz_HeJrvEscrQD4BsKzh1HskCYfy4MsaKquTqgRWJtTPGg/exec';
 
         try {
             await fetch(scriptURL, {
