@@ -393,73 +393,70 @@ const AboutSection = () => {
 };
 
 const ContactSection = () => {
-    const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+    const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+    const formRef = useRef<HTMLFormElement>(null);
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const form = e.target as HTMLFormElement;
-        const data = new FormData(form);
-        setFormStatus('submitting');
-        
-        // This is a common pattern for submitting to a Google Sheet via an intermediary service
-        // like a Google Apps Script Web App. You need to replace the URL below.
-        // For this to work, you must:
-        // 1. Create a Google Sheet.
-        // 2. Create a Google Apps Script (Extensions > Apps Script).
-        // 3. Paste a script that handles POST requests and writes to your sheet.
-        // 4. Deploy the script as a Web App, granting access to "Anyone".
-        // 5. Copy the Web App URL and paste it here.
-        const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE'; 
+        setStatus('submitting');
+        const form = e.currentTarget;
+        const scriptURL = 'https://script.google.com/macros/s/AKfycby8bIPFpLkuC9KW8Ld-f6eKwWebJIIc6HocOZ6oVZtXG5Fiv86iS3OxXy5rA27zriktOA/exec';
 
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: data,
-        })
-        .then(response => {
-             // Since many script hosts use redirects and CORS can be tricky,
-             // we'll optimistically assume success if we get any OK response.
-             if (response.ok || response.type === 'opaque') {
-                setFormStatus('success');
-                form.reset();
-             } else {
-                setFormStatus('error');
-             }
-        })
-        .catch(() => setFormStatus('error'));
+        try {
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors', // Important for Google Scripts to avoid CORS errors
+                body: new FormData(form),
+            });
+            // With 'no-cors', the response is opaque, so we can't check for success.
+            // We'll assume success if the fetch call doesn't throw a network error.
+            setStatus('success');
+            form.reset();
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            setStatus('error');
+        }
     };
-
-    const isSubmitting = formStatus === 'submitting';
 
     return (
         <Section id="contact">
             <div className="bg-gray-900/50 border border-gray-800 rounded-3xl p-8 md:p-16">
                 <h2 className="text-4xl md:text-5xl font-bold text-center mb-4">Let’s Grow Your <span className="text-gradient">Bookings.</span></h2>
                 <p className="text-center text-gray-400 max-w-xl mx-auto mb-12">Fill out the form below for a free, no-obligation consultation call.</p>
-                <form onSubmit={handleSubmit} className="max-w-xl mx-auto space-y-6">
-                    <input type="text" name="Name" placeholder="Your Name" required disabled={isSubmitting} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all disabled:opacity-50"/>
-                    <input type="text" name="BusinessName" placeholder="Your Business Name" required disabled={isSubmitting} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all disabled:opacity-50"/>
-                    <input type="tel" name="PhoneNumber" placeholder="Phone Number" required disabled={isSubmitting} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all disabled:opacity-50"/>
-                    <select name="ServiceType" required defaultValue="" disabled={isSubmitting} className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all disabled:opacity-50">
-                        <option value="" disabled>Select Service Type</option>
-                        <option value="marriage-hall">Marriage Hall</option>
-                        <option value="event-hotel">Event Hotel</option>
-                        <option value="school">School / Coaching</option>
-                        <option value="other">Other</option>
-                    </select>
-                    <button type="submit" disabled={isSubmitting} className="w-full bg-[#0056CB] text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-opacity-80 transition-all duration-300 transform hover:scale-105 glow-effect disabled:opacity-50 disabled:cursor-not-allowed">
-                        {isSubmitting ? 'Submitting...' : 'Request Consultation'}
-                    </button>
-                </form>
-
-                {formStatus === 'success' && (
-                    <p className="text-center text-green-400 mt-6 animate-pulse">
-                        Thank you! We've received your request and will contact you shortly.
-                    </p>
-                )}
-                {formStatus === 'error' && (
-                     <p className="text-center text-red-400 mt-6">
-                        Oops! Something went wrong. Please try again or contact us directly below.
-                    </p>
+                
+                {status === 'success' ? (
+                    <div className="text-center py-10 bg-gray-800/50 rounded-lg">
+                        <h3 className="text-2xl font-bold text-white mb-2">Thank You!</h3>
+                        <p className="text-gray-300">We've received your request and will contact you shortly.</p>
+                    </div>
+                ) : (
+                    <>
+                        {status === 'error' && (
+                           <div className="text-center mb-6 py-4 bg-red-900/50 border border-red-700 rounded-lg">
+                             <p className="font-semibold text-red-300">Error submitting form. Please try again.</p>
+                           </div>
+                        )}
+                        <form 
+                            ref={formRef}
+                            id="contact-form"
+                            onSubmit={handleSubmit}
+                            className="max-w-xl mx-auto space-y-6"
+                        >
+                            <input type="text" name="your_name" placeholder="Your Name" required className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all"/>
+                            <input type="text" name="business_name" placeholder="Your Business Name" required className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all"/>
+                            <input type="tel" name="phone" placeholder="Phone Number" required className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all"/>
+                            <select name="service_type" required defaultValue="" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all appearance-none invalid:text-gray-400" style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}>
+                                <option value="" disabled>Select Service Type</option>
+                                <option value="marriage-hall">Marriage Hall</option>
+                                <option value="event-hotel">Event Hotel</option>
+                                <option value="school">School / Coaching</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <button type="submit" disabled={status === 'submitting'} className="w-full bg-[#0056CB] text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-opacity-80 transition-all duration-300 transform hover:scale-105 glow-effect disabled:opacity-50 disabled:cursor-not-allowed">
+                                {status === 'submitting' ? 'Submitting...' : 'Request Consultation'}
+                            </button>
+                        </form>
+                    </>
                 )}
 
                 <div className="text-center mt-12">
