@@ -400,7 +400,7 @@ const ContactSection = () => {
         e.preventDefault();
         setStatus('submitting');
         const form = e.currentTarget;
-        const scriptURL = 'https://script.google.com/macros/s/AKfycby8bIPFpLkuC9KW8Ld-f6eKwWebJIIc6HocOZ6oVZtXG5Fiv86iS3OxXy5rA27zriktOA/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwP5uM7UyXHTq9kcMA9NHGqif2NN4JoZXnOZRq_XGS7GHXAMI7Y2w1aFGavR-JX9yUL-A/exec';
 
         try {
             await fetch(scriptURL, {
@@ -444,7 +444,20 @@ const ContactSection = () => {
                         >
                             <input type="text" name="your_name" placeholder="Your Name" required className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all"/>
                             <input type="text" name="business_name" placeholder="Your Business Name" required className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all"/>
-                            <input type="tel" name="phone" placeholder="Phone Number" required className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all"/>
+                            <input 
+                                type="tel" 
+                                name="phone" 
+                                placeholder="Phone Number (10 digits)" 
+                                required 
+                                pattern="[0-9]{10}"
+                                maxLength={10}
+                                title="Please enter a 10-digit phone number"
+                                onInput={(e) => {
+                                    const target = e.target as HTMLInputElement;
+                                    target.value = target.value.replace(/[^0-9]/g, '');
+                                }}
+                                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all"
+                            />
                             <select name="service_type" required defaultValue="" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all appearance-none invalid:text-gray-400" style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}>
                                 <option value="" disabled>Select Service Type</option>
                                 <option value="marriage-hall">Marriage Hall</option>
