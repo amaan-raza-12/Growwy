@@ -25,6 +25,9 @@ const WhatsAppIcon = () => (
 const PhoneCallIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
 );
+const ArrowUpIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+);
 
 // --- Industry Process Icons --- //
 const VenueTourIcon = () => <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>;
@@ -96,7 +99,7 @@ const Section: React.FC<{ id: string; className?: string; children: React.ReactN
         <section
             id={id}
             ref={ref}
-            className={`w-full max-w-6xl mx-auto px-6 py-20 md:py-32 transition-all duration-1000 transform ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} ${className}`}
+            className={`w-full max-w-6xl mx-auto px-6 py-20 md:py-32 transition-all duration-700 transform ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'} ${className}`}
         >
             {children}
         </section>
@@ -307,7 +310,7 @@ const HeroSection: React.FC<{ onNavigate: (id: string) => void }> = ({ onNavigat
     );
 };
 
-const WhatWeDoSection = () => {
+const WhatWeDoSection: React.FC<{ onNavigate: (id: string) => void }> = ({ onNavigate }) => {
     const services = [
         { icon: <CreateIcon />, title: "Create", description: "We shoot & edit high-quality videos and social media content." },
         { icon: <PromoteIcon />, title: "Promote", description: "We run targeted ads across Instagram, Facebook, and Google." },
@@ -372,11 +375,16 @@ const WhatWeDoSection = () => {
                     );
                 })}
             </div>
+            <div className="mt-24 text-center">
+                <button onClick={() => onNavigate('contact')} className="bg-[#0056CB] text-white px-8 py-3 rounded-lg font-bold text-lg hover:bg-opacity-80 transition-all duration-300 transform hover:scale-105 glow-effect">
+                    Ready to Grow? Book a Call
+                </button>
+            </div>
         </Section>
     );
 };
 
-const IndustriesSection = () => {
+const IndustriesSection: React.FC<{ onNavigate: (id: string) => void }> = ({ onNavigate }) => {
     const industryProcesses = [
         {
             title: "Marriage Halls & Hotels",
@@ -435,15 +443,18 @@ const IndustriesSection = () => {
                     );
                 })}
             </div>
-             <p className="text-center text-gray-400 mt-20">
-                While these are our key partners, our system works for any local business.
-            </p>
+            <div className="mt-20 text-center">
+                <p className="text-gray-400 mb-6">While these are our key partners, our system is proven to work for any local business.</p>
+                <button onClick={() => onNavigate('contact')} className="bg-[#0056CB] text-white px-8 py-3 rounded-lg font-bold text-lg hover:bg-opacity-80 transition-all duration-300 transform hover:scale-105 glow-effect">
+                    Find Out How We Can Help You
+                </button>
+            </div>
         </Section>
     );
 };
 
 
-const AboutSection = () => {
+const AboutSection: React.FC<{ onNavigate: (id: string) => void }> = ({ onNavigate }) => {
     const stats = [
         { value: "95%", label: "Client Retention" },
         { value: "3x", label: "Average ROI" },
@@ -504,6 +515,14 @@ const AboutSection = () => {
                 })()}
 
             </div>
+
+            <div className="mt-20 text-center">
+                <h3 className="text-3xl font-bold text-white mb-4">Ready to Write Your Success Story?</h3>
+                <p className="text-gray-400 max-w-2xl mx-auto mb-8">Join over 100 businesses that have scaled with Growwy. Let's discuss your growth plan.</p>
+                <button onClick={() => onNavigate('contact')} className="bg-[#0056CB] text-white px-8 py-3 rounded-lg font-bold text-lg hover:bg-opacity-80 transition-all duration-300 transform hover:scale-105 glow-effect">
+                    Get Your Free Growth Strategy
+                </button>
+            </div>
         </Section>
     );
 };
@@ -538,7 +557,7 @@ const ContactSection: React.FC<{ isPopupMode?: boolean }> = ({ isPopupMode = fal
         <Section id="contact" className={isPopupMode ? "p-0" : ""}>
             <div className={wrapperClass}>
                 <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Let’s Grow Your <span className="text-gradient">Bookings.</span></h2>
-                <p className="text-center text-gray-400 max-w-xl mx-auto mb-12">Fill out the form for a free, no-obligation consultation call.</p>
+                <p className={`text-center text-gray-400 max-w-xl mx-auto ${isPopupMode ? 'mb-6' : 'mb-12'}`}>Fill out the form for a free, no-obligation consultation call.</p>
                 
                 {status === 'success' ? (
                     <div className="text-center py-10 bg-gray-800/50 rounded-lg">
@@ -556,7 +575,7 @@ const ContactSection: React.FC<{ isPopupMode?: boolean }> = ({ isPopupMode = fal
                             ref={formRef}
                             id="contact-form"
                             onSubmit={handleSubmit}
-                            className="max-w-xl mx-auto space-y-6"
+                            className={`max-w-xl mx-auto ${isPopupMode ? 'space-y-3' : 'space-y-6'}`}
                         >
                             <input type="text" name="your_name" placeholder="Your Name" required className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all"/>
                             <input type="text" name="business_name" placeholder="Your Business Name" required className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0056CB] transition-all"/>
@@ -638,7 +657,7 @@ const PopupForm: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen,
     
     return (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-opacity duration-300 animate-fade-in">
-            <div ref={popupRef} className="relative bg-gray-900/80 border border-gray-800 rounded-3xl p-8 md:p-12 w-full max-w-2xl transform transition-transform duration-300 animate-slide-up">
+            <div ref={popupRef} className="relative bg-gray-900/80 border border-gray-800 rounded-3xl p-6 w-full max-w-2xl transform transition-transform duration-300 animate-slide-up">
                  <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors">
                      <CloseIcon />
                  </button>
@@ -667,6 +686,42 @@ const Footer = () => {
         </footer>
     );
 }
+
+const ScrollToTopButton = () => {
+    const [isVisible, setIsVisible] = useState(false);
+
+    const toggleVisibility = useCallback(() => {
+        if (window.scrollY > 300) {
+            setIsVisible(true);
+        } else {
+            setIsVisible(false);
+        }
+    }, []);
+
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
+
+    useEffect(() => {
+        window.addEventListener('scroll', toggleVisibility);
+        return () => window.removeEventListener('scroll', toggleVisibility);
+    }, [toggleVisibility]);
+
+    return (
+        <button
+            type="button"
+            onClick={scrollToTop}
+            className={`fixed bottom-8 right-8 bg-[#0056CB] text-white p-3 rounded-full shadow-lg hover:bg-opacity-80 transition-all duration-300 transform focus:outline-none glow-effect ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+            aria-label="Scroll to top"
+            style={{ zIndex: 40 }}
+        >
+            <ArrowUpIcon />
+        </button>
+    );
+};
 
 const App = () => {
     const [isPopupVisible, setPopupVisible] = useState(false);
@@ -708,13 +763,14 @@ const App = () => {
             <Header onNavigate={handleNavigate} />
             <main>
                 <HeroSection onNavigate={handleNavigate}/>
-                <WhatWeDoSection />
-                <IndustriesSection />
-                <AboutSection />
+                <WhatWeDoSection onNavigate={handleNavigate} />
+                <IndustriesSection onNavigate={handleNavigate} />
+                <AboutSection onNavigate={handleNavigate} />
                 <ContactSection />
             </main>
             <Footer />
             <PopupForm isOpen={isPopupVisible} onClose={() => setPopupVisible(false)} />
+            <ScrollToTopButton />
         </div>
     );
 };
