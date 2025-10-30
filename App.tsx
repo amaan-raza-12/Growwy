@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 // --- ICONS --- //
@@ -400,7 +401,7 @@ const ContactSection = () => {
         e.preventDefault();
         setStatus('submitting');
         const form = e.currentTarget;
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbxRH4lAQ2YnVO9DDDlYpCFVVz_HeJrvEscrQD4BsKzh1HskCYfy4MsaKquTqgRWJtTPGg/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzar2nE9S-CZcDnW2vowZsGBO4hYk_uCTgGZrbFs6CvcvrWLnu3q601o6bV6OO0izqp/exec';
 
         try {
             await fetch(scriptURL, {
